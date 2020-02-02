@@ -1,4 +1,4 @@
-package root.application.command.command;
+package root.application.query;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -6,10 +6,9 @@ import lombok.NonNull;
 
 @Builder
 @Getter
-public class CreateCategory
+public class GetLabelsUsage
 {
     @NonNull
-    private String categoryName;
-    @NonNull
     private String accountId;
+    private String labelNamePrefix;
 }

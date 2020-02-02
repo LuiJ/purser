@@ -1,11 +1,12 @@
-package root.application.command;
+package root.application;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import root.application.AccountService;
-import root.application.command.command.CreateLabel;
-import root.application.command.command.DeleteLabel;
-import root.domain.*;
+import root.application.command.CreateLabel;
+import root.application.command.DeleteLabel;
+import root.domain.Account;
+import root.domain.Label;
+import root.domain.LabelRepository;
 
 import java.util.List;
 import java.util.NoSuchElementException;

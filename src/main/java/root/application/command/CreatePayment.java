@@ -1,4 +1,4 @@
-package root.application.command.command;
+package root.application.command;
 
 import lombok.Builder;
 import lombok.Getter;

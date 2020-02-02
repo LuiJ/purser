@@ -3,8 +3,6 @@ package root;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import root.application.command.CategoryService;
-import root.application.query.LabelStatisticsQueryHandler;
 import root.domain.*;
 
 import java.util.Date;

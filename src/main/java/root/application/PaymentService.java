@@ -1,10 +1,9 @@
-package root.application.command;
+package root.application;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import root.application.AccountService;
-import root.application.command.command.CreatePayment;
-import root.application.command.command.DeletePayment;
+import root.application.command.CreatePayment;
+import root.application.command.DeletePayment;
 import root.domain.*;
 
 import java.util.List;

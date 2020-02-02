@@ -1,10 +1,9 @@
-package root.application.command;
+package root.application;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import root.application.AccountService;
-import root.application.command.command.CreateCategory;
-import root.application.command.command.DeleteCategory;
+import root.application.command.CreateCategory;
+import root.application.command.DeleteCategory;
 import root.domain.Account;
 import root.domain.Category;
 import root.domain.CategoryRepository;

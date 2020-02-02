@@ -3,21 +3,21 @@ package root.presentation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import root.application.command.CategoryService;
-import root.application.command.command.CreateCategory;
-import root.application.command.command.DeleteCategory;
+import root.application.CategoryService;
+import root.application.command.CreateCategory;
+import root.application.command.DeleteCategory;
 import root.presentation.dto.CreateCategoryRequest;
 
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/accounts/{accountId}/categories")
 @RequiredArgsConstructor
 public class CategoryController
 {
     private final CategoryService categoryService;
 
-    @PostMapping("/accounts/{accountId}/categories")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public void create(@PathVariable String accountId,
                        @RequestBody @Valid CreateCategoryRequest request)
@@ -29,7 +29,7 @@ public class CategoryController
         categoryService.execute(command);
     }
 
-    @DeleteMapping("/accounts/{accountId}/categories/{categoryId}")
+    @DeleteMapping("/{categoryId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable String accountId,
                        @PathVariable String categoryId)
