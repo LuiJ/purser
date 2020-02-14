@@ -11,15 +11,12 @@ import java.util.List;
 @Data
 public class CreatePaymentRequest
 {
-    @NotBlank
-    private String categoryId;
-
-    private List<String> labels;
-
-    private Date date;
-
     @NotNull
     private BigDecimal amount;
 
     private String description;
+
+    private Date date;
+
+    private List<String> namesOfLabels;
 }

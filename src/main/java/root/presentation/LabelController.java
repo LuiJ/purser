@@ -31,14 +31,14 @@ public class LabelController
         labelService.execute(command);
     }
 
-    @DeleteMapping("/{labelId}")
+    @DeleteMapping("/{labelName}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable String accountId,
-                       @PathVariable String labelId)
+                       @PathVariable String labelName)
     {
         DeleteLabel command = DeleteLabel.builder()
                 .accountId(accountId)
-                .labelId(labelId)
+                .labelName(labelName)
                 .build();
         labelService.execute(command);
     }

@@ -45,7 +45,7 @@ public class CategoryService
 
     private Supplier<NoSuchElementException> noSuchElementException(String categoryId, String accountId)
     {
-        String message = String.format("Category [%s] was not found for account [%]", categoryId, accountId);
+        String message = String.format("Category [%s] was not found for account [%s]", categoryId, accountId);
         return () -> new NoSuchElementException(message);
     }
 }

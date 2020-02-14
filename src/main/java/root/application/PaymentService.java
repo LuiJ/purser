@@ -24,7 +24,7 @@ public class PaymentService
     {
         Account account = accountService.get(command.getAccountId());
         Category category = categoryService.get(command.getCategoryId(), account);
-        List<Label> labels = labelService.resolve(command.getLabels(), account);
+        List<Label> labels = labelService.resolve(command.getNamesOfLabels(), account);
         Payment payment = Payment.builder()
                 .account(account)
                 .category(category)
@@ -47,7 +47,7 @@ public class PaymentService
 
     private Supplier<NoSuchElementException> noSuchElementException(String paymentId, String accountId)
     {
-        String message = String.format("Payment [%s] was not found for account [%]", paymentId, accountId);
+        String message = String.format("Payment [%s] was not found for account [%s]", paymentId, accountId);
         return () -> new NoSuchElementException(message);
     }
 }

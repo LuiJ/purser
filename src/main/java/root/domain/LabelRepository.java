@@ -12,9 +12,7 @@ public interface LabelRepository extends JpaRepository<Label, UUID>
     @Query("SELECT l FROM Label l WHERE l.account = :account AND l.name LIKE CONCAT(:namePrefix, '%')")
     List<Label> findByNamePrefixAndAccount(String namePrefix, Account account);
 
-    Label findByName(String name);
-
-    Optional<Label> findByIdAndAccount(UUID id, Account account);
+    Optional<Label> findByNameAndAccount(String name, Account account);
 
     List<Label> findAllByAccount(Account account);
 }

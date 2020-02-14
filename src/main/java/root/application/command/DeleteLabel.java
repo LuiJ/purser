@@ -9,7 +9,7 @@ import lombok.NonNull;
 public class DeleteLabel
 {
     @NonNull
-    private String labelId;
+    private String labelName;
     @NonNull
     private String accountId;
 }

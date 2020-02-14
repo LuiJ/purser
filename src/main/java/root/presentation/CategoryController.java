@@ -23,8 +23,8 @@ public class CategoryController
                        @RequestBody @Valid CreateCategoryRequest request)
     {
         CreateCategory command = CreateCategory.builder()
-                .accountId(accountId)
                 .categoryName(request.getName())
+                .accountId(accountId)
                 .build();
         categoryService.execute(command);
     }
@@ -35,8 +35,8 @@ public class CategoryController
                        @PathVariable String categoryId)
     {
         DeleteCategory command = DeleteCategory.builder()
-                .accountId(accountId)
                 .categoryId(categoryId)
+                .accountId(accountId)
                 .build();
         categoryService.execute(command);
     }

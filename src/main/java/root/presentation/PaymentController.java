@@ -11,7 +11,7 @@ import root.presentation.dto.CreatePaymentRequest;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/api/v1/accounts/{accountId}/payments")
+@RequestMapping("/api/v1/accounts/{accountId}/categories/{categoryId}/payments")
 @RequiredArgsConstructor
 public class PaymentController
 {
@@ -20,15 +20,16 @@ public class PaymentController
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public void create(@PathVariable String accountId,
+                       @PathVariable String categoryId,
                        @RequestBody @Valid CreatePaymentRequest request)
     {
         CreatePayment command = CreatePayment.builder()
-                .accountId(accountId)
-                .categoryId(request.getCategoryId())
-                .labels(request.getLabels())
-                .date(request.getDate())
                 .amount(request.getAmount())
                 .description(request.getDescription())
+                .date(request.getDate())
+                .accountId(accountId)
+                .categoryId(categoryId)
+                .namesOfLabels(request.getNamesOfLabels())
                 .build();
         paymentService.execute(command);
     }

@@ -13,17 +13,17 @@ import java.util.List;
 public class CreatePayment
 {
     @NonNull
-    private String categoryId;
+    private BigDecimal amount;
 
-    @NonNull
-    private String accountId;
-
-    private List<String> labels;
+    private String description;
 
     private Date date;
 
     @NonNull
-    private BigDecimal amount;
+    private String accountId;
 
-    private String description;
+    @NonNull
+    private String categoryId;
+
+    private List<String> namesOfLabels;
 }

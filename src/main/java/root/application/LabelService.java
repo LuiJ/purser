@@ -8,10 +8,7 @@ import root.domain.Account;
 import root.domain.Label;
 import root.domain.LabelRepository;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Supplier;
 
 import static java.util.stream.Collectors.toList;
@@ -33,9 +30,8 @@ public class LabelService
     public void execute(DeleteLabel command)
     {
         Account account = accountService.get(command.getAccountId());
-        UUID labelId = UUID.fromString(command.getLabelId());
-        Label label = labelRepository.findByIdAndAccount(labelId, account)
-                .orElseThrow(noSuchElementException(command.getLabelId(), command.getAccountId()));
+        Label label = labelRepository.findByNameAndAccount(command.getLabelName(), account)
+                .orElseThrow(noSuchElementException(command.getLabelName(), command.getAccountId()));
         labelRepository.delete(label);
     }
 
@@ -43,8 +39,9 @@ public class LabelService
     {
         List<Label> resolvedLabels = namesOfLabels.stream()
                 .map(String::toLowerCase)
-                .map(labelRepository::findByName)
-                .filter(Objects::nonNull)
+                .map(name -> labelRepository.findByNameAndAccount(name, account))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .collect(toList());
         List<String> namesOfResolvedLabels = resolvedLabels.stream()
                 .map(Label::getName)
@@ -66,9 +63,9 @@ public class LabelService
         return labelRepository.save(label);
     }
 
-    private Supplier<NoSuchElementException> noSuchElementException(String labelId, String accountId)
+    private Supplier<NoSuchElementException> noSuchElementException(String labelName, String accountId)
     {
-        String message = String.format("Label [%s] was not found for account [%]", labelId, accountId);
+        String message = String.format("Label [%s] was not found for account [%s]", labelName, accountId);
         return () -> new NoSuchElementException(message);
     }
 }
