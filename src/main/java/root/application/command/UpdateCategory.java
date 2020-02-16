@@ -6,10 +6,10 @@ import lombok.NonNull;
 
 @Builder
 @Getter
-public class CreateCategory
+public class UpdateCategory
 {
     @NonNull
-    private String categoryName;
+    private String categoryId;
 
     private Integer iconCode;
 

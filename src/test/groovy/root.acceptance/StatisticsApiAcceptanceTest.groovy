@@ -77,7 +77,7 @@ class StatisticsApiAcceptanceTest extends BaseAcceptanceTest
         def errorMessage = 'Account [$accountId] was not found'.replace('$accountId', accountId)
 
         expect:
-        failedCall('/labels-usage', accountId, errorMessage)
+        failedRequest('/labels-usage', accountId, errorMessage)
     }
 
     static final Map getStatistics(String urlSuffix, String accountId)
@@ -91,7 +91,7 @@ class StatisticsApiAcceptanceTest extends BaseAcceptanceTest
                 .as(Map.class)
     }
 
-    static final failedCall(String urlSuffix, String accountId, String errorMessage)
+    static final failedRequest(String urlSuffix, String accountId, String errorMessage)
     {
         def urlPrefix = '/api/v1/accounts/$accountId/statistics'.replace('$accountId', accountId)
         when().get(urlPrefix + urlSuffix)

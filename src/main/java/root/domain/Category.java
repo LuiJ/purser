@@ -8,7 +8,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "category")
 @Access(AccessType.FIELD)
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -21,6 +21,8 @@ public class Category
 
     @NonNull
     private String name;
+
+    private Integer iconCode;
 
     @NonNull
     @OneToOne(fetch = FetchType.LAZY)

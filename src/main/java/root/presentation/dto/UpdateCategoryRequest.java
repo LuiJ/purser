@@ -5,9 +5,7 @@ import lombok.Data;
 import javax.validation.constraints.NotBlank;
 
 @Data
-public class CreateCategoryRequest
+public class UpdateCategoryRequest
 {
-    @NotBlank(message = "categoryName cannot be blank")
-    private String name;
     private Integer iconCode;
 }

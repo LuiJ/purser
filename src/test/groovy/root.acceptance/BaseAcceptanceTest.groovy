@@ -56,10 +56,11 @@ abstract class BaseAcceptanceTest extends Specification
                 Account.builder().email(email).password(password).build())
     }
 
-    static final createCategory(String name, String accountId)
+    static final createCategory(String name, Integer iconCode, String accountId)
     {
         def resourceJson = toJson([
-                'name' : name
+                'name' : name,
+                'iconCode' : iconCode
         ])
         createResource('/categories', resourceJson, accountId)
     }
