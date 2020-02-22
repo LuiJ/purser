@@ -9,5 +9,7 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID>
 {
     Optional<Payment> findByIdAndAccount(UUID id, Account account);
 
-    Long countAllByAccountAndLabelsContains(Account account, Label label);
+    Long countByAccountAndCategory(Account account, Category category);
+
+    Long countByAccountAndLabelsContains(Account account, Label label);
 }

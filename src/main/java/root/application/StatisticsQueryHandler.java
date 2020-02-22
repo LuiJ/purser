@@ -29,6 +29,6 @@ public class StatisticsQueryHandler
         List<Label> labels = isBlank(labelNamePrefix) ? labelRepository.findAllByAccount(account) :
                 labelRepository.findByNamePrefixAndAccount(labelNamePrefix, account);
         return labels.stream().collect(Collectors.toMap(
-                Label::getName, label -> paymentRepository.countAllByAccountAndLabelsContains(account, label)));
+                Label::getName, label -> paymentRepository.countByAccountAndLabelsContains(account, label)));
     }
 }

@@ -1,10 +1,9 @@
 package root.acceptance
 
+import org.apache.http.HttpStatus
 import root.domain.Category
 
 import static io.restassured.RestAssured.when
-import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR
-import static org.apache.http.HttpStatus.SC_OK
 
 class StatisticsApiAcceptanceTest extends BaseAcceptanceTest
 {
@@ -85,7 +84,7 @@ class StatisticsApiAcceptanceTest extends BaseAcceptanceTest
         def urlPrefix = '/api/v1/accounts/$accountId/statistics'.replace('$accountId', accountId)
         when().get(urlPrefix + urlSuffix)
                 .then()
-                .statusCode(SC_OK)
+                .statusCode(HttpStatus.SC_OK)
                 .extract()
                 .body()
                 .as(Map.class)
@@ -96,7 +95,7 @@ class StatisticsApiAcceptanceTest extends BaseAcceptanceTest
         def urlPrefix = '/api/v1/accounts/$accountId/statistics'.replace('$accountId', accountId)
         when().get(urlPrefix + urlSuffix)
                 .then()
-                .statusCode(SC_INTERNAL_SERVER_ERROR)
+                .statusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR)
                 .extract()
                 .body()
                 .asString()

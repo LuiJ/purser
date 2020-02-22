@@ -1,6 +1,7 @@
 package root.acceptance
 
 import io.restassured.RestAssured
+import org.apache.http.HttpStatus
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.web.server.LocalServerPort
@@ -11,7 +12,7 @@ import spock.lang.Specification
 
 import static groovy.json.JsonOutput.toJson
 import static io.restassured.RestAssured.given
-import static org.apache.http.HttpStatus.SC_CREATED
+import static io.restassured.RestAssured.when
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration
@@ -85,14 +86,33 @@ abstract class BaseAcceptanceTest extends Specification
         createResource(uriSuffix, resourceJson, accountId)
     }
 
-    static final createResource(String uriSuffix, String resourceJson, String accountId)
+    static final createResource(String uriSuffix, String requestBodyJson, String accountId)
     {
         def uriPrefix = '/api/v1/accounts/$accountId'.replace('$accountId', accountId)
         given().contentType('application/json')
-                .body(resourceJson)
+                .body(requestBodyJson)
                 .when()
                 .post(uriPrefix + uriSuffix)
                 .then()
-                .statusCode(SC_CREATED)
+                .statusCode(HttpStatus.SC_CREATED)
+    }
+
+    static final updateResource(String uriSuffix, String requestBodyJson, String accountId)
+    {
+        def uriPrefix = '/api/v1/accounts/$accountId'.replace('$accountId', accountId)
+        given().contentType('application/json')
+                .body(requestBodyJson)
+                .when()
+                .put(uriPrefix + uriSuffix)
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+    }
+
+    static final deleteResource(String uriSuffix, String accountId)
+    {
+        def uriPrefix = '/api/v1/accounts/$accountId'.replace('$accountId', accountId)
+        when().delete(uriPrefix + uriSuffix)
+                .then()
+                .statusCode(HttpStatus.SC_NO_CONTENT)
     }
 }

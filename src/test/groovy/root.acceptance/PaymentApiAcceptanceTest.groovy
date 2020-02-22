@@ -7,11 +7,6 @@ class PaymentApiAcceptanceTest extends BaseAcceptanceTest
         // TODO
     }
 
-    def 'should create absent category during payment creation'()
-    {
-        // TODO
-    }
-
     def 'should create absent labels during payment creation'()
     {
         // TODO

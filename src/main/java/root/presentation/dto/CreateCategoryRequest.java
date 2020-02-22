@@ -7,7 +7,7 @@ import javax.validation.constraints.NotBlank;
 @Data
 public class CreateCategoryRequest
 {
-    @NotBlank(message = "categoryName cannot be blank")
+    @NotBlank(message = "[name] should be provided")
     private String name;
     private Integer iconCode;
 }

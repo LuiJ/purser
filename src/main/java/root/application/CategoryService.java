@@ -9,6 +9,7 @@ import root.domain.Account;
 import root.domain.Category;
 import root.domain.CategoryRepository;
 
+import javax.transaction.Transactional;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -22,6 +23,7 @@ public class CategoryService
     private final CategoryRepository categoryRepository;
     private final AccountService accountService;
 
+    @Transactional
     public void execute(CreateCategory command)
     {
         Account account = accountService.get(command.getAccountId());
@@ -35,6 +37,7 @@ public class CategoryService
         categoryRepository.save(category);
     }
 
+    @Transactional
     public void execute(UpdateCategory command)
     {
         Account account = accountService.get(command.getAccountId());
@@ -43,6 +46,7 @@ public class CategoryService
         categoryRepository.save(updatedCategory);
     }
 
+    @Transactional
     public void execute(DeleteCategory command)
     {
         Account account = accountService.get(command.getAccountId());

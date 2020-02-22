@@ -23,21 +23,22 @@ public class Payment
     private UUID id;
 
     @NonNull
-    @OneToOne
-    private Category category;
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    private List<Label> labels;
-
-    @NonNull
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date date;
-
     private BigDecimal amount;
 
     private String description;
 
     @NonNull
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date date;
+
+    @NonNull
     @OneToOne(fetch = FetchType.LAZY)
     private Account account;
+
+    @NonNull
+    @OneToOne
+    private Category category;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    private List<Label> labels;
 }

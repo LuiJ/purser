@@ -6,6 +6,7 @@ import root.application.command.CreatePayment;
 import root.application.command.DeletePayment;
 import root.domain.*;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -20,22 +21,24 @@ public class PaymentService
     private final CategoryService categoryService;
     private final LabelService labelService;
 
+    @Transactional
     public void execute(CreatePayment command)
     {
         Account account = accountService.get(command.getAccountId());
         Category category = categoryService.get(command.getCategoryId(), account);
         List<Label> labels = labelService.resolve(command.getNamesOfLabels(), account);
         Payment payment = Payment.builder()
+                .amount(command.getAmount())
+                .description(command.getDescription())
+                .date(command.getDate())
                 .account(account)
                 .category(category)
                 .labels(labels)
-                .date(command.getDate())
-                .amount(command.getAmount())
-                .description(command.getDescription())
                 .build();
         paymentRepository.save(payment);
     }
 
+    @Transactional
     public void execute(DeletePayment command)
     {
         Account account = accountService.get(command.getAccountId());
