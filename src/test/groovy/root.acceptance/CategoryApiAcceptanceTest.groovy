@@ -147,11 +147,6 @@ class CategoryApiAcceptanceTest extends BaseAcceptanceTest
 
     def 'should delete category with all related payments successfully'()
     {
-        // TODO: In order to pass this test it is necessary to:
-        // 1 - add DB init script to src/test/resources using MySQL syntax
-        // 2 - adjust application-test.yml in order to h2 in MySQL mode
-        // 3 - switch off schema auto generation based on @Entity classes
-        // 4 - set ON DELETE CASCADE for relation Payment->Category
         given: 'category'
         def category = categoryRepository.saveAndFlush(
                 Category.builder()
