@@ -4,18 +4,16 @@ import root.domain.Category
 import root.domain.Payment
 
 import static groovy.json.JsonOutput.toJson
-import static io.restassured.RestAssured.given
-import static io.restassured.RestAssured.when
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR
 
 class CategoryApiAcceptanceTest extends BaseAcceptanceTest
 {
-    def 'any operation on category should fail for non-existent account'()
+    def 'any operation on category should fail for non-existent account id'()
     {
         given:
         def nonExistentAccountId = '123e4567-e89b-12d3-a456-426655440000'
-        def categoryId = '987e4567-e89b-12d3-a456-426655450000'
+        def uriSuffix = CATEGORY_URI_SUFFIX_TEMPLATE.replace('$categoryId','987e4567-e89b-12d3-a456-426655450000')
         def requestBodyJson = toJson([
                 'name' : 'category',
                 'iconCode' : 123
@@ -24,40 +22,41 @@ class CategoryApiAcceptanceTest extends BaseAcceptanceTest
                 .replace('$accountId', nonExistentAccountId)
 
         expect:
-        failedCreateCategoryRequest(requestBodyJson, nonExistentAccountId, SC_INTERNAL_SERVER_ERROR, expectedErrorMessage)
-        failedUpdateCategoryRequest(categoryId, requestBodyJson, nonExistentAccountId, SC_INTERNAL_SERVER_ERROR, expectedErrorMessage)
-        failedDeleteCategoryRequest(categoryId, nonExistentAccountId, SC_INTERNAL_SERVER_ERROR, expectedErrorMessage)
+        failedCreateResourceRequest(CATEGORIES_URI_SUFFIX, requestBodyJson, nonExistentAccountId, SC_INTERNAL_SERVER_ERROR, expectedErrorMessage)
+        failedUpdateResourceRequest(uriSuffix, requestBodyJson, nonExistentAccountId, SC_INTERNAL_SERVER_ERROR, expectedErrorMessage)
+        failedDeleteResourceRequest(uriSuffix, nonExistentAccountId, SC_INTERNAL_SERVER_ERROR, expectedErrorMessage)
     }
 
-    def 'any operation should fail for non-existent category'()
+    def 'any operation on category should fail for non-existent category id'()
     {
         given:
-        def accountId = account.getId().toString()
+        def accountId = existingAccount.getId().toString()
         def nonExistentCategoryId = '123e4567-e89b-12d3-a456-426655440000'
+        def uriSuffix = CATEGORY_URI_SUFFIX_TEMPLATE.replace('$categoryId', nonExistentCategoryId)
         def requestBodyJson = '{}'
         def expectedErrorMessage = 'Category [$categoryId] was not found for account [$accountId]'
                 .replace('$categoryId', nonExistentCategoryId)
                 .replace('$accountId', accountId)
 
         expect:
-        failedUpdateCategoryRequest(nonExistentCategoryId, requestBodyJson, accountId, SC_INTERNAL_SERVER_ERROR, expectedErrorMessage)
-        failedDeleteCategoryRequest(nonExistentCategoryId, accountId, SC_INTERNAL_SERVER_ERROR, expectedErrorMessage)
+        failedUpdateResourceRequest(uriSuffix, requestBodyJson, accountId, SC_INTERNAL_SERVER_ERROR, expectedErrorMessage)
+        failedDeleteResourceRequest(uriSuffix, accountId, SC_INTERNAL_SERVER_ERROR, expectedErrorMessage)
     }
 
     def 'should create category successfully'()
     {
         given: 'account'
-        def accountId = account.getId().toString()
+        def accountId = existingAccount.getId().toString()
 
         and: 'category init data'
         def categoryName = 'category-1'
         def iconCode = 123
 
         when: 'create a category'
-        createCategory(categoryName, iconCode, accountId)
+        createCategory(accountId, categoryName, iconCode)
 
         then:
-        def createdCategory = categoryRepository.findByNameAndAccount(categoryName, account).get()
+        def createdCategory = categoryRepository.findByNameAndAccount(categoryName, existingAccount).get()
         createdCategory.getName().equals(categoryName)
         createdCategory.getIconCode().equals(iconCode)
     }
@@ -65,12 +64,12 @@ class CategoryApiAcceptanceTest extends BaseAcceptanceTest
     def 'should not create category with duplicated name'()
     {
         given: 'account'
-        def accountId = account.getId().toString()
+        def accountId = existingAccount.getId().toString()
 
         and: 'existing category'
         def categoryName = 'category-2'
         def iconCode = 456
-        createCategory(categoryName, iconCode, accountId)
+        createCategory(accountId, categoryName, iconCode)
 
         and: 'create category request body'
         def categoryJson = toJson([
@@ -84,16 +83,13 @@ class CategoryApiAcceptanceTest extends BaseAcceptanceTest
                 .replace('$accountId', accountId)
 
         expect:
-        failedCreateCategoryRequest(categoryJson, accountId, SC_INTERNAL_SERVER_ERROR, expectedErrorMessage)
-
-        and:
-        categoryRepository.findAll().size() == 1
+        failedCreateResourceRequest(CATEGORIES_URI_SUFFIX, categoryJson, accountId, SC_INTERNAL_SERVER_ERROR, expectedErrorMessage)
     }
 
     def 'should not create category if name is blank'()
     {
         given: 'account'
-        def accountId = account.getId().toString()
+        def accountId = existingAccount.getId().toString()
 
         and: 'create category request body without category name'
         def categoryWithoutNameJson = toJson([
@@ -110,28 +106,25 @@ class CategoryApiAcceptanceTest extends BaseAcceptanceTest
         def expectedErrorMessage = '[name] should be provided'
 
         expect:
-        failedCreateCategoryRequest(categoryWithoutNameJson, accountId, SC_BAD_REQUEST, expectedErrorMessage)
-        failedCreateCategoryRequest(categoryWithBlankNameJson, accountId, SC_BAD_REQUEST, expectedErrorMessage)
-
-        and:
-        categoryRepository.findAll().isEmpty()
+        failedCreateResourceRequest(CATEGORIES_URI_SUFFIX, categoryWithoutNameJson, accountId, SC_BAD_REQUEST, expectedErrorMessage)
+        failedCreateResourceRequest(CATEGORIES_URI_SUFFIX, categoryWithBlankNameJson, accountId, SC_BAD_REQUEST, expectedErrorMessage)
     }
 
     def 'should update category successfully'()
     {
         given: 'account'
-        def accountId = account.getId().toString()
+        def accountId = existingAccount.getId().toString()
 
         and: 'category'
         def categoryName = 'category'
         def iconCode = 123
-        def categoryId = categoryRepository.saveAndFlush(Category.builder().name(categoryName).iconCode(iconCode).account(account).build()).getId()
+        def categoryId = categoryRepository.saveAndFlush(Category.builder().name(categoryName).iconCode(iconCode).account(existingAccount).build()).getId()
 
         and:
         def newIconCode = 234
 
         and:
-        def uriSuffix = '/categories/' + categoryId.toString()
+        def uriSuffix = CATEGORY_URI_SUFFIX_TEMPLATE.replace('$categoryId', categoryId.toString())
         def updateRequest = toJson([
                 'iconCode' : newIconCode
         ])
@@ -152,71 +145,29 @@ class CategoryApiAcceptanceTest extends BaseAcceptanceTest
                 Category.builder()
                         .name('category')
                         .iconCode(123)
-                        .account(account)
+                        .account(existingAccount)
                         .build())
 
         and: 'payments related to the category'
         paymentRepository.saveAndFlush(Payment.builder()
                 .amount(BigDecimal.ONE)
                 .date(new Date())
-                .account(account)
+                .account(existingAccount)
                 .category(category)
                 .build())
         paymentRepository.saveAndFlush(Payment.builder()
                 .amount(BigDecimal.TEN)
                 .date(new Date())
-                .account(account)
+                .account(existingAccount)
                 .category(category)
                 .build())
-        paymentRepository.countByAccountAndCategory(account, category) == 2
+        paymentRepository.countByAccountAndCategory(existingAccount, category) == 2
 
         when:
         categoryRepository.delete(category)
 
         then:
-        paymentRepository.countByAccountAndCategory(account, category) == 0
+        paymentRepository.countByAccountAndCategory(existingAccount, category) == 0
         !categoryRepository.findById(category.getId()).isPresent()
-    }
-
-    static final failedCreateCategoryRequest(String requestBodyJson, String accountId, int statusCode, String errorMessage)
-    {
-        def uri = '/api/v1/accounts/$accountId/categories'.replace('$accountId', accountId)
-        given().contentType('application/json')
-                .body(requestBodyJson)
-                .when()
-                .post(uri)
-                .then()
-                .statusCode(statusCode)
-                .extract()
-                .body()
-                .asString()
-                .contains(errorMessage)
-    }
-
-    static final failedUpdateCategoryRequest(String categoryId, String requestBodyJson, String accountId, int statusCode, String errorMessage)
-    {
-        def uriPrefix = '/api/v1/accounts/$accountId/categories/'.replace('$accountId', accountId)
-        given().contentType('application/json')
-                .body(requestBodyJson)
-                .when()
-                .put(uriPrefix + categoryId)
-                .then()
-                .statusCode(statusCode)
-                .extract()
-                .body()
-                .asString()
-                .contains(errorMessage)
-    }
-
-    static final failedDeleteCategoryRequest(String categoryId, String accountId, int statusCode, String errorMessage)
-    {
-        def uriPrefix = '/api/v1/accounts/$accountId/categories/'.replace('$accountId', accountId)
-        when().delete(uriPrefix + categoryId)
-                .then()
-                .statusCode(statusCode)
-                .extract()
-                .body()
-                .asString()
-                .contains(errorMessage)
     }
 }

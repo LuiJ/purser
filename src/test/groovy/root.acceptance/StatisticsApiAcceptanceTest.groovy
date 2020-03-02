@@ -10,10 +10,10 @@ class StatisticsApiAcceptanceTest extends BaseAcceptanceTest
     def 'labels usage statistics by account'()
     {
         given: 'account'
-        def accountId = account.getId().toString()
+        def accountId = existingAccount.getId().toString()
 
         and: 'category'
-        def category = Category.builder().name('category-1').account(account).build()
+        def category = Category.builder().name('category-1').account(existingAccount).build()
         def categoryId = categoryRepository.save(category).getId().toString()
 
         and: 'labels'
@@ -39,10 +39,10 @@ class StatisticsApiAcceptanceTest extends BaseAcceptanceTest
     def 'labels usage statistics by account and label prefix'()
     {
         given: 'account'
-        def accountId = account.getId().toString()
+        def accountId = existingAccount.getId().toString()
 
         and: 'category'
-        def category = Category.builder().name('category-1').account(account).build()
+        def category = Category.builder().name('category-1').account(existingAccount).build()
         def categoryId = categoryRepository.save(category).getId().toString()
 
         and: 'labels'
@@ -92,13 +92,17 @@ class StatisticsApiAcceptanceTest extends BaseAcceptanceTest
 
     static final failedRequest(String urlSuffix, String accountId, String errorMessage)
     {
-        def urlPrefix = '/api/v1/accounts/$accountId/statistics'.replace('$accountId', accountId)
-        when().get(urlPrefix + urlSuffix)
+        when().get(formStatisticsUriPrefix(accountId) + urlSuffix)
                 .then()
                 .statusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR)
                 .extract()
                 .body()
                 .asString()
                 .contains(errorMessage)
+    }
+
+    private static final formStatisticsUriPrefix(String accountId)
+    {
+        formUriPrefix(accountId) + '/statistics'
     }
 }

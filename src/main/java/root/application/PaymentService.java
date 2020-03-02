@@ -7,10 +7,10 @@ import root.application.command.DeletePayment;
 import root.domain.*;
 
 import javax.transaction.Transactional;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Supplier;
+
+import static java.util.Optional.ofNullable;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +30,7 @@ public class PaymentService
         Payment payment = Payment.builder()
                 .amount(command.getAmount())
                 .description(command.getDescription())
-                .date(command.getDate())
+                .date(ofNullable(command.getDate()).orElse(new Date()))
                 .account(account)
                 .category(category)
                 .labels(labels)

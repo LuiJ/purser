@@ -24,7 +24,7 @@ public class LabelService
     {
         String name = command.getLabelName();
         Account account = accountService.get(command.getAccountId());
-        createLabel(name, account);
+        createLabel(account, name);
     }
 
     public void execute(DeleteLabel command)
@@ -49,12 +49,12 @@ public class LabelService
         namesOfLabels.stream()
                 .map(String::toLowerCase)
                 .filter(name -> !namesOfResolvedLabels.contains(name))
-                .map(name -> createLabel(name, account))
+                .map(name -> createLabel(account, name))
                 .forEach(resolvedLabels::add);
         return resolvedLabels;
     }
 
-    private Label createLabel(String name, Account account)
+    private Label createLabel(Account account, String name)
     {
         Label label = Label.builder()
                 .name(name.toLowerCase())
