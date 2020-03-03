@@ -67,30 +67,60 @@ class PaymentApiAcceptanceTest extends BaseAcceptanceTest
         given:
         def accountId = existingAccount.getId().toString()
         def categoryId = existingCategory.getId().toString()
-        def amount = 3.5d
+        def amount = 3.5d;
         def description = 'payment1'
-        def date = System.currentTimeMillis()
+        def dateMillis = 123L
         def labelName = existingLabel.getName()
 
         and:
         paymentRepository.findAll().size() == 0
 
         when:
-        createPayment(amount, description, date, accountId, categoryId, [labelName])
+        createPayment(amount, description, dateMillis, accountId, categoryId, [labelName])
 
         then:
         paymentRepository.findAll().size() == 1
 
         and:
         def createdPayment = paymentRepository.findAll().get(0)
-        createdPayment.getAmount() == amount
-        createdPayment.getDescription() == description
-        createdPayment.getDate() == date
+        createdPayment.getAmount().doubleValue() == amount
+        createdPayment.getDescription().equals(description)
+        createdPayment.getDate().equals(new Date(dateMillis))
         createdPayment.getLabels() == [existingLabel]
     }
 
     def 'should create absent labels during payment creation'()
     {
-        // TODO: Implement via modification of 'should create payment successfully' test
+        given:
+        def accountId = existingAccount.getId().toString()
+        def categoryId = existingCategory.getId().toString()
+        def amount = 3.5d;
+        def description = 'payment1'
+        def dateMillis = 123L
+        def label1Name = existingLabel.getName()
+        def label2Name = 'label-123'
+        def label3Name = 'label-345'
+
+        and:
+        paymentRepository.findAll().size() == 0
+        !labelRepository.findByNameAndAccount(label2Name, existingAccount).isPresent()
+        !labelRepository.findByNameAndAccount(label3Name, existingAccount).isPresent()
+
+        when:
+        createPayment(amount, description, dateMillis, accountId, categoryId, [label1Name, label2Name, label3Name])
+
+        then:
+        paymentRepository.findAll().size() == 1
+        labelRepository.findByNameAndAccount(label2Name, existingAccount).isPresent()
+        labelRepository.findByNameAndAccount(label3Name, existingAccount).isPresent()
+
+        and:
+        def createdPayment = paymentRepository.findAll().get(0)
+        def label2 = labelRepository.findByNameAndAccount(label2Name, existingAccount).get()
+        def label3 = labelRepository.findByNameAndAccount(label3Name, existingAccount).get()
+        createdPayment.getAmount().doubleValue() == amount
+        createdPayment.getDescription().equals(description)
+        createdPayment.getDate().equals(new Date(dateMillis))
+        createdPayment.getLabels() == [existingLabel, label2, label3]
     }
 }

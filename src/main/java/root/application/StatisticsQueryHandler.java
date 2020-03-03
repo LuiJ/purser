@@ -26,7 +26,7 @@ public class StatisticsQueryHandler
     {
         Account account = accountService.get(query.getAccountId());
         String labelNamePrefix = query.getLabelNamePrefix();
-        List<Label> labels = isBlank(labelNamePrefix) ? labelRepository.findAllByAccount(account) :
+        List<Label> labels = isBlank(labelNamePrefix) ? labelRepository.findByAccount(account) :
                 labelRepository.findByNamePrefixAndAccount(labelNamePrefix, account);
         return labels.stream().collect(Collectors.toMap(
                 Label::getName, label -> paymentRepository.countByAccountAndLabelsContains(account, label)));

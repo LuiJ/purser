@@ -14,5 +14,5 @@ public interface LabelRepository extends JpaRepository<Label, UUID>
 
     Optional<Label> findByNameAndAccount(String name, Account account);
 
-    List<Label> findAllByAccount(Account account);
+    List<Label> findByAccount(Account account);
 }
