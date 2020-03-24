@@ -37,10 +37,12 @@ public class PaymentController
     @DeleteMapping("/{paymentId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable String accountId,
+                       @PathVariable String categoryId,
                        @PathVariable String paymentId)
     {
         DeletePayment command = DeletePayment.builder()
                 .accountId(accountId)
+                .categoryId(categoryId)
                 .paymentId(paymentId)
                 .build();
         paymentService.execute(command);

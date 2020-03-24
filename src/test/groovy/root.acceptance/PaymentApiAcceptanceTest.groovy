@@ -1,6 +1,9 @@
 package root.acceptance
 
+import static org.apache.commons.lang3.time.DateUtils.isSameDay
+
 import static groovy.json.JsonOutput.toJson
+import static org.apache.commons.collections4.CollectionUtils.isEqualCollection
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR
 
 class PaymentApiAcceptanceTest extends BaseAcceptanceTest
@@ -54,9 +57,10 @@ class PaymentApiAcceptanceTest extends BaseAcceptanceTest
         def uriSuffix = PAYMENT_URI_SUFFIX_TEMPLATE
                 .replace('$categoryId', categoryId)
                 .replace('$paymentId', nonExistentPaymentId)
-        def expectedErrorMessage = 'Payment [$paymentId] was not found for account [$accountId]'
+        def expectedErrorMessage = 'Payment [$paymentId] was not found for account [$accountId] and category [$categoryId]'
                 .replace('$paymentId', nonExistentPaymentId)
                 .replace('$accountId', accountId)
+                .replace('$categoryId', categoryId)
 
         expect:
         failedDeleteResourceRequest(uriSuffix, accountId, SC_INTERNAL_SERVER_ERROR, expectedErrorMessage)
@@ -69,7 +73,7 @@ class PaymentApiAcceptanceTest extends BaseAcceptanceTest
         def categoryId = existingCategory.getId().toString()
         def amount = 3.5d;
         def description = 'payment1'
-        def dateMillis = 123L
+        def dateMillis = 1584005576000L
         def labelName = existingLabel.getName()
 
         and:
@@ -79,14 +83,42 @@ class PaymentApiAcceptanceTest extends BaseAcceptanceTest
         createPayment(amount, description, dateMillis, accountId, categoryId, [labelName])
 
         then:
-        paymentRepository.findAll().size() == 1
+        def payments = paymentRepository.findAll()
+        payments.size() == 1
 
         and:
-        def createdPayment = paymentRepository.findAll().get(0)
+        def createdPayment = payments.get(0)
         createdPayment.getAmount().doubleValue() == amount
-        createdPayment.getDescription().equals(description)
-        createdPayment.getDate().equals(new Date(dateMillis))
-        createdPayment.getLabels() == [existingLabel]
+        createdPayment.getDescription() == description
+        createdPayment.getDate().getTime() == dateMillis
+        isEqualCollection(createdPayment.getLabels(), [existingLabel])
+    }
+
+    def 'should create payment without labels'()
+    {
+        given:
+        def accountId = existingAccount.getId().toString()
+        def categoryId = existingCategory.getId().toString()
+        def amount = 4.97d;
+        def description = 'payment1'
+        def dateMillis = 1584005576000L
+
+        and:
+        paymentRepository.findAll().size() == 0
+
+        when:
+        createPayment(amount, description, dateMillis, accountId, categoryId, null)
+
+        then:
+        def payments = paymentRepository.findAll()
+        payments.size() == 1
+
+        and:
+        def createdPayment = payments.get(0)
+        createdPayment.getAmount().doubleValue() == amount
+        createdPayment.getDescription() == description
+        createdPayment.getDate().getTime() == dateMillis
+        createdPayment.getLabels().isEmpty()
     }
 
     def 'should create absent labels during payment creation'()
@@ -96,7 +128,7 @@ class PaymentApiAcceptanceTest extends BaseAcceptanceTest
         def categoryId = existingCategory.getId().toString()
         def amount = 3.5d;
         def description = 'payment1'
-        def dateMillis = 123L
+        def dateMillis = 1584005576000L
         def label1Name = existingLabel.getName()
         def label2Name = 'label-123'
         def label3Name = 'label-345'
@@ -110,17 +142,47 @@ class PaymentApiAcceptanceTest extends BaseAcceptanceTest
         createPayment(amount, description, dateMillis, accountId, categoryId, [label1Name, label2Name, label3Name])
 
         then:
-        paymentRepository.findAll().size() == 1
         labelRepository.findByNameAndAccount(label2Name, existingAccount).isPresent()
         labelRepository.findByNameAndAccount(label3Name, existingAccount).isPresent()
 
         and:
-        def createdPayment = paymentRepository.findAll().get(0)
+        def payments = paymentRepository.findAll()
+        payments.size() == 1
+
+        and:
+        def createdPayment = payments.get(0)
         def label2 = labelRepository.findByNameAndAccount(label2Name, existingAccount).get()
         def label3 = labelRepository.findByNameAndAccount(label3Name, existingAccount).get()
         createdPayment.getAmount().doubleValue() == amount
-        createdPayment.getDescription().equals(description)
-        createdPayment.getDate().equals(new Date(dateMillis))
-        createdPayment.getLabels() == [existingLabel, label2, label3]
+        createdPayment.getDescription() == description
+        createdPayment.getDate().getTime() == dateMillis
+        isEqualCollection(createdPayment.getLabels(), [existingLabel, label2, label3])
+    }
+
+    def 'should add current date if date was not provided during payment creation'()
+    {
+        given:
+        def accountId = existingAccount.getId().toString()
+        def categoryId = existingCategory.getId().toString()
+        def amount = 3.5d;
+        def description = 'payment1'
+        def labelName = existingLabel.getName()
+
+        and:
+        paymentRepository.findAll().size() == 0
+
+        when:
+        createPayment(amount, description, null, accountId, categoryId, [labelName])
+
+        then:
+        def payments = paymentRepository.findAll()
+        payments.size() == 1
+
+        and:
+        def createdPayment = payments.get(0)
+        createdPayment.getAmount().doubleValue() == amount
+        createdPayment.getDescription() == description
+        isSameDay(createdPayment.getDate(), new Date())
+        isEqualCollection(createdPayment.getLabels(), [existingLabel])
     }
 }

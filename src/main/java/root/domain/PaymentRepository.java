@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public interface PaymentRepository extends JpaRepository<Payment, UUID>
 {
-    Optional<Payment> findByIdAndAccount(UUID id, Account account);
+    Optional<Payment> findByIdAndAccountAndCategory(UUID id, Account account, Category category);
 
     Long countByAccountAndCategory(Account account, Category category);
 

@@ -13,6 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @ToString(of = {"name"})
+@EqualsAndHashCode(of = {"id", "name"})
 public class Label
 {
     @Id

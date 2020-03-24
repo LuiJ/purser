@@ -54,6 +54,28 @@ public class CategoryService
         categoryRepository.delete(category);
     }
 
+    public Category resolveCategory(String categoryName, Account account)
+    {
+        return categoryRepository.findByNameAndAccount(categoryName, account)
+                .orElseGet(() -> {
+                    Category category = Category.builder()
+                            .name(categoryName)
+                            .account(account)
+                            .build();
+                    return categoryRepository.save(category);
+                });
+    }
+
+    private void checkExistence(String categoryName, Account account)
+    {
+        if (categoryRepository.findByNameAndAccount(categoryName, account).isPresent())
+        {
+            String message = format("Category with name [%s] already exists for account [%s]",
+                    categoryName, account.getId().toString());
+            throw new RuntimeException(message);
+        }
+    }
+
     Category get(String id, Account account)
     {
         UUID categoryId = UUID.fromString(id);
@@ -65,15 +87,5 @@ public class CategoryService
     {
         String message = format("Category [%s] was not found for account [%s]", categoryId, accountId);
         return () -> new NoSuchElementException(message);
-    }
-
-    private void checkExistence(String categoryName, Account account)
-    {
-        if (categoryRepository.findByNameAndAccount(categoryName, account).isPresent())
-        {
-            String message = format("Category with name [%s] already exists for account [%s]",
-                    categoryName, account.getId().toString());
-            throw new RuntimeException(message);
-        }
     }
 }

@@ -1,6 +1,7 @@
 package root.application;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import root.application.command.CreateLabel;
 import root.application.command.DeleteLabel;
@@ -37,6 +38,10 @@ public class LabelService
 
     List<Label> resolve(List<String> namesOfLabels, Account account)
     {
+        if (CollectionUtils.isEmpty(namesOfLabels))
+        {
+            return List.of();
+        }
         List<Label> resolvedLabels = namesOfLabels.stream()
                 .map(String::toLowerCase)
                 .map(name -> labelRepository.findByNameAndAccount(name, account))

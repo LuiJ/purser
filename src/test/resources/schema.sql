@@ -34,7 +34,7 @@ CREATE TABLE `payment` (
     `id` binary(16) NOT NULL,
     `amount` decimal(16,9) NOT NULL,
     `description` varchar(512) DEFAULT NULL,
-    `date` datetime NOT NULL,
+    `date` timestamp NOT NULL,
     `account_id` binary(16) NOT NULL,
     `category_id` binary(16) NOT NULL,
     PRIMARY KEY (`id`),

@@ -11,5 +11,7 @@ public class DeletePayment
     @NonNull
     private String paymentId;
     @NonNull
+    private String categoryId;
+    @NonNull
     private final String accountId;
 }

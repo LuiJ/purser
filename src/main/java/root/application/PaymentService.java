@@ -42,15 +42,16 @@ public class PaymentService
     public void execute(DeletePayment command)
     {
         Account account = accountService.get(command.getAccountId());
+        Category category = categoryService.get(command.getCategoryId(), account);
         UUID paymentId = UUID.fromString(command.getPaymentId());
-        Payment payment = paymentRepository.findByIdAndAccount(paymentId, account)
-                .orElseThrow(noSuchElementException(command.getPaymentId(), command.getAccountId()));
+        Payment payment = paymentRepository.findByIdAndAccountAndCategory(paymentId, account, category)
+                .orElseThrow(noSuchElementException(command.getPaymentId(), command.getAccountId(), command.getCategoryId()));
         paymentRepository.delete(payment);
     }
 
-    private Supplier<NoSuchElementException> noSuchElementException(String paymentId, String accountId)
+    private Supplier<NoSuchElementException> noSuchElementException(String paymentId, String accountId, String categoryId)
     {
-        String message = String.format("Payment [%s] was not found for account [%s]", paymentId, accountId);
+        String message = String.format("Payment [%s] was not found for account [%s] and category [%s]", paymentId, accountId, categoryId);
         return () -> new NoSuchElementException(message);
     }
 }

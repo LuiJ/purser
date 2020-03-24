@@ -97,7 +97,7 @@ abstract class BaseAcceptanceTest extends Specification
         createResource(LABELS_URI_SUFFIX, resourceJson, accountId)
     }
 
-    static final createPayment(double amount, String description, long date, String accountId, String categoryId, List<String> namesOfLabels)
+    static final createPayment(double amount, String description, Long date, String accountId, String categoryId, List<String> namesOfLabels)
     {
         def uriSuffix = PAYMENTS_URI_SUFFIX_TEMPLATE.replace('$categoryId', categoryId)
         def resourceJson = toJson([

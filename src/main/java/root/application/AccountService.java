@@ -15,7 +15,7 @@ public class AccountService
 {
     private final AccountRepository accountRepository;
 
-    Account get(String id)
+    public Account get(String id)
     {
         UUID accountId = UUID.fromString(id);
         return accountRepository.findById(accountId)
